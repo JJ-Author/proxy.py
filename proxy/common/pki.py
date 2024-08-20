@@ -12,6 +12,7 @@
 
        pki
 """
+import datetime
 import os
 import sys
 import time
@@ -161,6 +162,14 @@ def sign_csr(
             '-in', csr_path,
             '-out', crt_path,
         ]
+
+        try:
+            start_date = start_date = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=3)).strftime('%y%m%d%H%M%SZ')
+        except Exception as e:
+            logger.error(f"Error occurred while determining the before date for https interception certificate: {e}")
+            start_date = None
+        if start_date:
+            command.extend(['-not_before', start_date])
         return run_openssl_command(command, timeout)
 
 
